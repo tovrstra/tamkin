@@ -1,0 +1,279 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>1. Installation of TAMkin software &mdash; TAMkin 1.0.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="TAMkin 1.0.5 documentation" href="../index.html" />
+    <link rel="next" title="2. If you encounter a problem" href="support.html" />
+    <link rel="prev" title="The TAMkin Manual" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="support.html" title="2. If you encounter a problem"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="The TAMkin Manual"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">TAMkin 1.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installation-of-tamkin-software">
+<h1>1. Installation of TAMkin software<a class="headerlink" href="#installation-of-tamkin-software" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="disclaimer">
+<h2>1.1. Disclaimer<a class="headerlink" href="#disclaimer" title="Permalink to this headline">¶</a></h2>
+<p>TAMkin is mainly developed and tested on Linux systems. If you run any other
+operating system, some of the instructions below may not work.</p>
+</div>
+<div class="section" id="molmod-dependency">
+<h2>1.2. MolMod dependency<a class="headerlink" href="#molmod-dependency" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://molmod.github.com/molmod/">MolMod</a> is a Python library used by most
+Python programs developed at the CMM. It must be installed before TAMkin can
+be used or installed. Installation and download instructions can be found in the
+<a class="reference external" href="http://molmod.github.com/molmod/tutorial/install.html">molmod documentation</a>.
+The instructions below only work of the MolMod package is installed.</p>
+</div>
+<div class="section" id="external-depedencies">
+<h2>1.3. External depedencies<a class="headerlink" href="#external-depedencies" title="Permalink to this headline">¶</a></h2>
+<p>Some other software packages should be installed before TAMkin can be installed
+or used. It is recommended to use the software package management of your Linux
+distribution to install these dependencies.</p>
+<p>The following software must be installed for TAMkin:</p>
+<ul class="simple">
+<li>Python 2.6 or 2.7: <a class="reference external" href="http://www.python.org/doc/">http://www.python.org/doc/</a></li>
+<li>Numpy 1.0 or later: <a class="reference external" href="http://numpy.scipy.org/">http://numpy.scipy.org/</a></li>
+<li>Scipy 0.6 or later: <a class="reference external" href="http://www.scipy.org/">http://www.scipy.org/</a></li>
+</ul>
+<p>Most Linux distributions can install this software with just a single command.
+They are listed below for several popular Linux distributions:</p>
+<ul>
+<li><p class="first">Ubuntu 12.4:</p>
+<div class="highlight-python"><pre>sudo apt-get install python python-numpy python-scipy</pre>
+</div>
+</li>
+<li><p class="first">Debian 5. You first have to become root because the sudo program is not
+configured by default.</p>
+<div class="highlight-python"><pre>su -
+apt-get install python python-numpy python-scipy
+exit</pre>
+</div>
+</li>
+<li><p class="first">Fedora 17.:</p>
+<div class="highlight-python"><pre>sudo yum install python numpy scipy</pre>
+</div>
+</li>
+<li><p class="first">Suse 11.2:</p>
+<div class="highlight-python"><pre>sudo zypper ar http://download.opensuse.org/repositories/devel:/languages:/python/openSUSE_11.2/devel:languages:python.repo
+sudo zypper install python-numpy python-scipy</pre>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="download-the-code">
+<h2>1.4. Download the code<a class="headerlink" href="#download-the-code" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="stable-release-recommended">
+<h3>1.4.1. Stable release (recommended)<a class="headerlink" href="#stable-release-recommended" title="Permalink to this headline">¶</a></h3>
+<p>The latest stable source code release can be downloaded here:</p>
+<blockquote>
+<div><a class="reference external" href="http://github.com/molmod/tamkin/releases/download/v1.0.5/TAMkin-1.0.5.tar.gz">http://github.com/molmod/tamkin/releases/download/v1.0.5/TAMkin-1.0.5.tar.gz</a></div></blockquote>
+<p>Choose a suitable directory, e.g. <tt class="docutils literal"><span class="pre">~/build</span></tt>, download and unpack the archive:</p>
+<div class="highlight-python"><pre>mkdir -p ~/build
+cd ~/build
+wget http://github.com/molmod/tamkin/releases/download/v1.0.5/TAMkin-1.0.5.tar.gz
+tar -xvzf TAMkin-1.0.5.tar.gz
+cd TAMkin-1.0.5</pre>
+</div>
+</div>
+<div class="section" id="latest-development-code-experts-only">
+<h3>1.4.2. Latest development code (experts only)<a class="headerlink" href="#latest-development-code-experts-only" title="Permalink to this headline">¶</a></h3>
+<p>In order to get the latest development version of the source code, you need to
+work with git. Git is a version control system
+that makes life easy when a group of people are working on a common source code.
+All information about git (including downloads and tutorials) can be found here:
+<a class="reference external" href="http://git-scm.com/">http://git-scm.com/</a>. The official git URL of TAMkin is:
+git://github.com/molmod/tamkin.git. In order to <cite>clone</cite> the public TAMkin
+repository, run this command:</p>
+<div class="highlight-python"><pre>git clone git://github.com/molmod/tamkin.git
+cd tamkin</pre>
+</div>
+<p>The version history can be updated with the latest patches with the following
+command:</p>
+<div class="highlight-python"><pre>git pull</pre>
+</div>
+<p>There is also a web interface to TAMkin&#8217;s git repository:
+<a class="reference external" href="https://github.com/molmod/tamkin">https://github.com/molmod/tamkin</a></p>
+</div>
+</div>
+<div class="section" id="installing-the-latest-version-of-tamkin">
+<h2>1.5. Installing the latest version of TAMkin<a class="headerlink" href="#installing-the-latest-version-of-tamkin" title="Permalink to this headline">¶</a></h2>
+<p>Execute the following command in the TAMkin source directory to install TAMkin
+in your home directory.</p>
+<div class="highlight-python"><pre>./setup.py install --user</pre>
+</div>
+<p>You are now ready to start using TAMkin!</p>
+</div>
+<div class="section" id="a-few-quick-checks">
+<h2>1.6. A few quick checks<a class="headerlink" href="#a-few-quick-checks" title="Permalink to this headline">¶</a></h2>
+<p>The Python modules should be accessible from any Python session. This can be
+checked by starting Python interactively and loading the modules manually. There
+should be no errors when importing the modules:</p>
+<div class="highlight-python"><pre>$ python
+Python 2.6.5 (r265:79063, Apr 16 2010, 13:57:41)
+[GCC 4.4.3] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+&gt;&gt;&gt; import tamkin
+&gt;&gt;&gt; import molmod
+&gt;&gt;&gt; quit()</pre>
+</div>
+</div>
+<div class="section" id="testing-your-installation">
+<h2>1.7. Testing your installation<a class="headerlink" href="#testing-your-installation" title="Permalink to this headline">¶</a></h2>
+<p>For the development and testing, one needs to install one additional package:</p>
+<ul class="simple">
+<li>Nosetests &gt;= 0.11: <a class="reference external" href="http://somethingaboutorange.com/mrl/projects/nose/0.11.2/">http://somethingaboutorange.com/mrl/projects/nose/0.11.2/</a></li>
+<li>Sphinx &gt;= 1.0: <a class="reference external" href="http://sphinx.pocoo.org/">http://sphinx.pocoo.org/</a></li>
+</ul>
+<p>Most Linux distributions can install this software with just a single terminal command:</p>
+<ul>
+<li><p class="first">Ubuntu 12.4:</p>
+<div class="highlight-python"><pre>sudo apt-get install python-nose python-sphinx</pre>
+</div>
+</li>
+<li><p class="first">Debian 5:</p>
+<div class="highlight-python"><pre>su -
+apt-get install python-nose python-sphinx
+exit</pre>
+</div>
+</li>
+<li><p class="first">Fedora 17:</p>
+<div class="highlight-python"><pre>sudo yum install python-nose sphinx</pre>
+</div>
+</li>
+<li><p class="first">Suse 11.2:</p>
+<div class="highlight-python"><pre>sudo zypper install python-nose sphinx</pre>
+</div>
+</li>
+</ul>
+<p>Once these dependecies are installed, execute the following command in the
+TAMkin source tree to run the tests:</p>
+<div class="highlight-python"><pre>nosetests -v test</pre>
+</div>
+<p>If some tests fail, post the output of the tests on the <a class="reference external" href="https://groups.google.com/forum/#!forum/tamkin">TAMkin
+mailing list</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">1. Installation of TAMkin software</a><ul>
+<li><a class="reference internal" href="#disclaimer">1.1. Disclaimer</a></li>
+<li><a class="reference internal" href="#molmod-dependency">1.2. MolMod dependency</a></li>
+<li><a class="reference internal" href="#external-depedencies">1.3. External depedencies</a></li>
+<li><a class="reference internal" href="#download-the-code">1.4. Download the code</a><ul>
+<li><a class="reference internal" href="#stable-release-recommended">1.4.1. Stable release (recommended)</a></li>
+<li><a class="reference internal" href="#latest-development-code-experts-only">1.4.2. Latest development code (experts only)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installing-the-latest-version-of-tamkin">1.5. Installing the latest version of TAMkin</a></li>
+<li><a class="reference internal" href="#a-few-quick-checks">1.6. A few quick checks</a></li>
+<li><a class="reference internal" href="#testing-your-installation">1.7. Testing your installation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../index.html"
+                        title="previous chapter">The TAMkin Manual</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="support.html"
+                        title="next chapter">2. If you encounter a problem</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/tutorial/install.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="support.html" title="2. If you encounter a problem"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../index.html" title="The TAMkin Manual"
+             >previous</a> |</li>
+        <li><a href="../index.html">TAMkin 1.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, Toon Verstraelen, An Ghysels.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

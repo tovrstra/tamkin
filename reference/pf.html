@@ -1,0 +1,2434 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4. Partition functions &mdash; TAMkin 1.0.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="TAMkin 1.0.5 documentation" href="../index.html" />
+    <link rel="next" title="5. Auxiliary modules" href="aux.html" />
+    <link rel="prev" title="3. Normal mode analysis" href="nma.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="aux.html" title="5. Auxiliary modules"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="nma.html" title="3. Normal mode analysis"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">TAMkin 1.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="partition-functions">
+<h1>4. Partition functions<a class="headerlink" href="#partition-functions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="the-molecular-partion-function">
+<h2>4.1. The molecular partion function<a class="headerlink" href="#the-molecular-partion-function" title="Permalink to this headline">¶</a></h2>
+<p><strong>Inheritance diagram</strong></p>
+<p class="graphviz">
+<img src="../_images/inheritance-268b7f3a29c499a0aea1a2e56e4b0395c015303c.png" alt="Inheritance diagram of tamkin.partf" usemap="#inheritance37628f8cbb" class="inheritance"/>
+<map id="inheritance37628f8cbb" name="inheritance37628f8cbb">
+<area shape="rect" id="node1" href="#tamkin.partf.ExtTrans" title="ExtTrans" alt="" coords="481,81,556,106"/>
+<area shape="rect" id="node2" href="#tamkin.partf.Info" title="Info" alt="" coords="423,6,495,31"/>
+<area shape="rect" id="node4" href="#tamkin.partf.PartFun" title="PartFun" alt="" coords="580,81,652,106"/>
+<area shape="rect" id="node6" href="#tamkin.partf.ExtRot" title="ExtRot" alt="" coords="136,81,208,106"/>
+<area shape="rect" id="node7" href="#tamkin.partf.Electronic" title="Electronic" alt="" coords="233,81,316,106"/>
+<area shape="rect" id="node8" href="#tamkin.partf.Vibrations" title="Vibrations" alt="" coords="327,155,413,181"/>
+<area shape="rect" id="node9" href="#tamkin.partf.PCMCorrection" title="PCMCorrection" alt="" coords="341,81,456,106"/>
+<area shape="rect" id="node3" href="#tamkin.partf.StatFys" title="StatFys" alt="" coords="283,6,355,31"/>
+<area shape="rect" id="node5" href="#tamkin.partf.StatFysTerms" title="StatFysTerms" alt="" coords="5,81,112,106"/>
+</map>
+</p>
+<span class="target" id="module-tamkin.partf"></span><p>The workhorse of this module is the <strong>PartFun</strong> class. A PartFun object
+represents a partition function with a solid interface. PartFun objects
+can be used to study chemical equilibrium, rate coefficients and various
+thermodynamic properties.</p>
+<p>These are the other classes and functions present in this module:</p>
+<ul>
+<li><dl class="first docutils">
+<dt><strong>Abstract classes:</strong></dt>
+<dd><ul class="first last simple">
+<li>Info</li>
+<li>StatFys</li>
+<li>StatFysTerms</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>Contributions to the partition function:</strong></dt>
+<dd><ul class="first last simple">
+<li>Electronic</li>
+<li>ExtTrans</li>
+<li>ExtRot</li>
+<li>Vibrations</li>
+<li>Rotor (see rotor.py)</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>Helper functions:</strong></dt>
+<dd><ul class="first last simple">
+<li>helper_levels, helpert_levels, helpertt_levels,</li>
+<li>helper_vibrations, helpert_vibrations, helpertt_vibrations</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p><strong>Important</strong>: Partition functions can be constructed for NpT gases, NVT
+gases and many other systems. The return values of methods such as
+<tt class="docutils literal"><span class="pre">free_energy</span></tt>, <tt class="docutils literal"><span class="pre">internal_heat</span></tt> and <tt class="docutils literal"><span class="pre">heat_capacity</span></tt> are often given
+specialized names in the context of different partition functions. For
+example, chemists tend to use the following names:</p>
+<ul>
+<li><dl class="first docutils">
+<dt>3D NVT gas:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">PartFun.free_energy</span></tt> -&gt; the Helmholtz free energy</li>
+<li><tt class="docutils literal"><span class="pre">PartFun.internal_heat</span></tt> -&gt; the internal energy</li>
+<li><tt class="docutils literal"><span class="pre">PartFun.heat_capacity</span></tt> -&gt; the heat capacity at constant volume</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>3D NpT gas:</dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">PartFun.free_energy</span></tt> -&gt; the Gibbs free energy</li>
+<li><tt class="docutils literal"><span class="pre">PartFun.internal_heat</span></tt> -&gt; the enthalpy</li>
+<li><tt class="docutils literal"><span class="pre">PartFun.heat_capacity</span></tt> -&gt; the heat capacity at constant pressure</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Don&#8217;t say we did not warn you. Terminology can be very confusing.</p>
+<p>All the extensive thermodynamic quantities computed here are in atomic units
+per molecule. If you want to express the Gibbs free energy at 300 Kelvin of a
+system in kJ/mol, use the molmod module to perform unit conversions. For
+example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">pf</span> <span class="o">=</span> <span class="n">PartFun</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="p">[</span><span class="n">ExtTrans</span><span class="p">(</span><span class="n">cp</span><span class="o">=</span><span class="bp">True</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">pf</span><span class="o">.</span><span class="n">free_energy</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span><span class="o">/</span><span class="n">kjmol</span>
+</pre></div>
+</div>
+<dl class="class">
+<dt id="tamkin.partf.Info">
+<em class="property">class </em><tt class="descclassname">tamkin.partf.</tt><tt class="descname">Info</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#tamkin.partf.Info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>An object that has a name and that can dump info to a file.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">name</span></tt> &#8211; the name used for this object in the output</div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="tamkin.partf.Info.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.partf.Info.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a description to file.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">f</span></tt> &#8211; the file object to write to</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.Info.dump_values">
+<tt class="descname">dump_values</tt><big>(</big><em>f</em>, <em>label</em>, <em>values</em>, <em>format</em>, <em>num_col=8</em><big>)</big><a class="headerlink" href="#tamkin.partf.Info.dump_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a nicely formatted array of numbers to file.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">f</span></tt> &#8211; the file object to write to</div>
+<div class="line"><tt class="docutils literal"><span class="pre">label</span></tt> &#8211; a label that explains the meaning of the numbers</div>
+<div class="line"><tt class="docutils literal"><span class="pre">values</span></tt> &#8211; the array with numbers</div>
+<div class="line"><tt class="docutils literal"><span class="pre">format</span></tt> &#8211; a Python format string for one number</div>
+</div>
+</dd>
+<dt>Optional argumet:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">num_col</span></tt> &#8211; the number of columns [default=8]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.partf.StatFys">
+<em class="property">class </em><tt class="descclassname">tamkin.partf.</tt><tt class="descname">StatFys</tt><a class="headerlink" href="#tamkin.partf.StatFys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Abstract class for (contributions to) the parition function.</p>
+<p>The constructor (__init__) and four methods (init_part_fun, helper,
+helpert, helpertt) must be implemented in derived classes.</p>
+<dl class="method">
+<dt id="tamkin.partf.StatFys.chemical_potential">
+<tt class="descname">chemical_potential</tt><big>(</big><em>temp</em>, <em>helpern=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.chemical_potential" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the chemical potential.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">helper</span></tt> &#8211; an alternative implementation of helpern
+[default=self.helpern]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.entropy">
+<tt class="descname">entropy</tt><big>(</big><em>temp</em>, <em>helper=None</em>, <em>helpert=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.entropy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the entropy contribution per molecule.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+</div>
+</dd>
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">helper</span></tt> &#8211; an alternative implementation of helper
+[default=self.helper]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">helpert</span></tt> &#8211; an alternative implementation of helpert
+[default=self.helpert]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.free_energy">
+<tt class="descname">free_energy</tt><big>(</big><em>temp</em>, <em>helper=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.free_energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the free energy per molecule.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">helper</span></tt> &#8211; an alternative implementation of helper
+[default=self.helper]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.heat_capacity">
+<tt class="descname">heat_capacity</tt><big>(</big><em>temp</em>, <em>helpert=None</em>, <em>helpertt=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.heat_capacity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the heat capacity per molecule.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+</div>
+</dd>
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">helpert</span></tt> &#8211; an alternative implementation of helpert
+[default=self.helpert]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">helpertt</span></tt> &#8211; an alternative implementation of helpertt
+[default=self.helpertt]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.helper">
+<tt class="descname">helper</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.helper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function.</p>
+<p>Returns</p>
+<div class="math">
+<p><img src="../_images/math/4b6fdd66f0bc0a1099c4b46e87802c9164d43783.png" alt="T^n \frac{\ln(Z_N)}{N}"/></p>
+</div><p>where <img class="math" src="../_images/math/3a9fdd7a7ca370875115e506f4362d729ed94e77.png" alt="Z_N"/> is (the contribution to) the many body partition
+function and <img class="math" src="../_images/math/fc97ef67268cd4e91bacdf12b8901d7036c9a056.png" alt="N"/> is the total number of particles. In all
+cases, except for the translational contribution, this comes down to:</p>
+<div class="math">
+<p><img src="../_images/math/b31efe2f0f0fe71fd8cfc36c8cfa4248ccbe7b47.png" alt="T^n \ln(Z_1)"/></p>
+</div><p>where <img class="math" src="../_images/math/90b6bf917826bbd1085455a7da8c0653516fb2c2.png" alt="\ln(Z_1)"/> is the single-particle contribution to the
+partition function.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+<div class="line"><tt class="docutils literal"><span class="pre">n</span></tt> &#8211; the power for the temperature factor</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.helpern">
+<tt class="descname">helpern</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.helpern" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function N.</p>
+<p>Returns</p>
+<div class="math">
+<p><img src="../_images/math/ade320bf2504cf29c40dc9005c53d017f93791cc.png" alt="T^n \frac{\partial \ln(Z_N)}{\partial N}"/></p>
+</div><p>where <img class="math" src="../_images/math/3a9fdd7a7ca370875115e506f4362d729ed94e77.png" alt="Z_N"/> is (the contribution to) the many body partition
+function and <img class="math" src="../_images/math/fc97ef67268cd4e91bacdf12b8901d7036c9a056.png" alt="N"/> is the total number of particles. This is used
+to compute the chemical potential and reaction free energies. In all
+cases, except for the total partition function and translational
+contribution, this comes down to the method <tt class="docutils literal"><span class="pre">helper</span></tt>.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+<div class="line"><tt class="docutils literal"><span class="pre">n</span></tt> &#8211; the power for the temperature factor</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.helpert">
+<tt class="descname">helpert</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.helpert" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function T.</p>
+<p>Returns</p>
+<div class="math">
+<p><img src="../_images/math/0ac397d59d3403c30040bce92a56c1e5d9195bab.png" alt="T^n \frac{d \left(\frac{\ln(Z_N)}{N}\right)}{dT}"/></p>
+</div><p>where <img class="math" src="../_images/math/3a9fdd7a7ca370875115e506f4362d729ed94e77.png" alt="Z_N"/> is (the contribution to) the many body partition
+function and <img class="math" src="../_images/math/fc97ef67268cd4e91bacdf12b8901d7036c9a056.png" alt="N"/> is the total number of particles.  In all
+cases, except for the translational contribution, this comes down to:</p>
+<div class="math">
+<p><img src="../_images/math/12a63f4d44df82e08ffa426f68f15f10f09ecc58.png" alt="T^n \frac{\partial \ln(Z_1)}{\partial T}"/></p>
+</div><p>where <img class="math" src="../_images/math/90b6bf917826bbd1085455a7da8c0653516fb2c2.png" alt="\ln(Z_1)"/> is the single-particle contribution to the
+partition function.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+<div class="line"><tt class="docutils literal"><span class="pre">n</span></tt> &#8211; the power for the temperature factor</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.helpertt">
+<tt class="descname">helpertt</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.helpertt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function TT.</p>
+<p>Returns</p>
+<div class="math">
+<p><img src="../_images/math/bf4821eba174ae0fcb72d593a64059544a1ae0c0.png" alt="T^n \frac{d^2 \left(\frac{\ln(Z_N)}{N}\right)}{dT^2}"/></p>
+</div><p>where <img class="math" src="../_images/math/3a9fdd7a7ca370875115e506f4362d729ed94e77.png" alt="Z_N"/> is (the contribution to) the many body partition
+function and <img class="math" src="../_images/math/fc97ef67268cd4e91bacdf12b8901d7036c9a056.png" alt="N"/> is the total number of particles. In all
+cases, except for the translational contribution, this comes down to:</p>
+<div class="math">
+<p><img src="../_images/math/4c6c82df2e57d168e1dba76c0f9cbb30cebeacbf.png" alt="T^n \frac{\partial^2 \ln(Z_1)}{\partial T^2}"/></p>
+</div><p>where <img class="math" src="../_images/math/90b6bf917826bbd1085455a7da8c0653516fb2c2.png" alt="\ln(Z_1)"/> is the single-particle contribution to the
+partition function.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+<div class="line"><tt class="docutils literal"><span class="pre">n</span></tt> &#8211; the power for the temperature factor</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.helperv">
+<tt class="descname">helperv</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.helperv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function V</p>
+<p>This always the same as the method <tt class="docutils literal"><span class="pre">helpern</span></tt>, except for the
+total partition function and the translational contribution to the
+partition function. Then it returns</p>
+<div class="math">
+<p><img src="../_images/math/a7343ffdf1b2efc1f06eeb552a93550e795efa6f.png" alt="T^n \frac{\partial \ln(Z_N)}{\partial N} - \ln\left(\frac{V}{N}\right)"/></p>
+</div><p>This is used for the computation of equilibrium constants, and rate
+constants.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; temperature</div>
+<div class="line"><tt class="docutils literal"><span class="pre">n</span></tt> &#8211; the power for the temperature factor</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.init_part_fun">
+<tt class="descname">init_part_fun</tt><big>(</big><em>nma</em>, <em>partf</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.init_part_fun" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute parameters that depend on nma and partition function.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">nma</span></tt> &#8211; an NMA object</div>
+<div class="line"><tt class="docutils literal"><span class="pre">partf</span></tt> &#8211; A PartFun object</div>
+</div>
+</dd>
+</dl>
+<p>This method is called by the PartFun object and should not be called
+by the user. When the PartFun object is initialized, each
+contribution can further initialize its parameters based on the
+information available in the nma and partf objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.internal_heat">
+<tt class="descname">internal_heat</tt><big>(</big><em>temp</em>, <em>helpert=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.internal_heat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the internal heat per molecule.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">helpert</span></tt> &#8211; an alternative implementation of helpert
+[default=self.helpert]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.log">
+<tt class="descname">log</tt><big>(</big><em>temp</em>, <em>helper=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log function</p>
+<p>The logarithm of the N-particle partition function divided by the
+number of particles:</p>
+<div class="math">
+<p><img src="../_images/math/42619d008e3ebe600b0b9df87c2a00b6a40d7355.png" alt="\frac{\ln(Z_N)}{N}"/></p>
+</div><p>For all contributions, except for the translational, this comes down
+to:</p>
+<div class="math">
+<p><img src="../_images/math/7331f4d52ebcdb218bc0fa9c2d3d1eb63d869709.png" alt="\ln(Z_1)"/></p>
+</div><dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">helper</span></tt> &#8211; an alternative implementation of helper
+[default=self.helper]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.logn">
+<tt class="descname">logn</tt><big>(</big><em>temp</em>, <em>helpern=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.logn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log function N</p>
+<p>The derivative of the logarithm of the many-particle partition
+function towards to number of particles.</p>
+<div class="math">
+<p><img src="../_images/math/463de1ea8136fbc14831ab713ff2df99e36b8ea7.png" alt="\frac{\partial \ln(Z_N)}{\partial N}"/></p>
+</div><p>In most cases, this is the same as the logarithm of the
+single-particle partition divided by the number of particles. (see
+method <tt class="docutils literal"><span class="pre">log</span></tt>.) The only exception is the translational contribution
+to the partition function, and hence also the total partition
+function.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">helpern</span></tt> &#8211; an alternative implementation of helpern
+[default=self.helpern]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.logt">
+<tt class="descname">logt</tt><big>(</big><em>temp</em>, <em>helpert=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.logt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log function T</p>
+<p>The derivative towards temperature of the logarithm of the N-particle
+partition function divided by the number of particles:</p>
+<div class="math">
+<p><img src="../_images/math/c53b734b0c935cdd5f0353d42d5ecc583ded4125.png" alt="\frac{d \left(\frac{\ln(Z_N)}{N}\right)}{dT}"/></p>
+</div><p>For all contributions, except for the translational, this comes down
+to:</p>
+<div class="math">
+<p><img src="../_images/math/170a2c229f5a00d3e7fb56e76b0e82bd31058468.png" alt="\frac{\partial \ln(Z_1)}{\partial T}"/></p>
+</div><dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+</div>
+</dd>
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">helpert</span></tt> &#8211; an alternative implementation of helpert
+[default=self.helpert]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.logtt">
+<tt class="descname">logtt</tt><big>(</big><em>temp</em>, <em>helpertt=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.logtt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log function TT</p>
+<p>The second derivative towards temperature of the logarithm of the
+N-particle partition function divided by the number of particles.</p>
+<div class="math">
+<p><img src="../_images/math/ed01333629861552fbda9d849dce26abd75869e3.png" alt="\frac{d^2 \left(\frac{\ln(Z_N)}{N}\right)}{dT^2}"/></p>
+</div><p>For all contributions, except for the translational, this comes down
+to:</p>
+<div class="math">
+<p><img src="../_images/math/a5cdb8adc2977ae2a403392514f9b51636c47d1c.png" alt="\frac{\partial^2 \ln(Z_1)}{\partial T^2}"/></p>
+</div><dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+</div>
+</dd>
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">helpertt</span></tt> &#8211; an alternative implementation of helpertt
+[default=self.helpertt]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.logv">
+<tt class="descname">logv</tt><big>(</big><em>temp</em>, <em>helperv=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.logv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log function V</p>
+<p>This always the same as the method <tt class="docutils literal"><span class="pre">logn</span></tt>, except for the
+total partition function and the translational contribution to the
+partition function. Then it returns</p>
+<div class="math">
+<p><img src="../_images/math/7a3327aa4f9ff034bf68bc6700fbbb6905b3f686.png" alt="\frac{\partial \ln(Z_N)}{\partial N} - \ln\left(\frac{V}{N}\right)"/></p>
+</div><p>This is used for the computation of equilibrium constants, and rate
+constants.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">helperv</span></tt> &#8211; an alternative implementation of helperv
+[default=self.helperv]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFys.zero_point_energy">
+<tt class="descname">zero_point_energy</tt><big>(</big><em>helpern=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFys.zero_point_energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the zero-point energy.</p>
+<dl class="docutils">
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">helper</span></tt> &#8211; an alternative implementation of helpern
+[default=self.helpern]</div>
+</div>
+</dd>
+</dl>
+<p>In TAMkin the zero-point energy is defined as the limit of the
+chemical potential for the temperature going towards zero.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.partf.StatFysTerms">
+<em class="property">class </em><tt class="descclassname">tamkin.partf.</tt><tt class="descname">StatFysTerms</tt><big>(</big><em>num_terms</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tamkin.partf.StatFys" title="tamkin.partf.StatFys"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.partf.StatFys</span></tt></a></p>
+<p>Abstract class for (contributions to) the parition function with multiple terms.</p>
+<p>The different terms (or factors if you like) are of the same mathematical
+structure.</p>
+<p>The constructor (__init__) and the four methods (init_part_fun,
+helper_terms, helpert_terms, helpertt_terms) must be implemented in
+derived classes.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd>num_terms`` &#8211; the number of terms present in this contribution.</dd>
+</dl>
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.chemical_potential_terms">
+<tt class="descname">chemical_potential_terms</tt><big>(</big><em>temp</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.chemical_potential_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with chemical_potential results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.chemical_potential" title="tamkin.partf.StatFys.chemical_potential"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.chemical_potential()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.entropy_terms">
+<tt class="descname">entropy_terms</tt><big>(</big><em>temp</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.entropy_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with entropy results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.entropy" title="tamkin.partf.StatFys.entropy"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.entropy()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.free_energy_terms">
+<tt class="descname">free_energy_terms</tt><big>(</big><em>temp</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.free_energy_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with free_energy results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.free_energy" title="tamkin.partf.StatFys.free_energy"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.free_energy()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.heat_capacity_terms">
+<tt class="descname">heat_capacity_terms</tt><big>(</big><em>temp</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.heat_capacity_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with heat_capacity results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.heat_capacity" title="tamkin.partf.StatFys.heat_capacity"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.heat_capacity()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.helper">
+<tt class="descname">helper</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.helper" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helper" title="tamkin.partf.StatFys.helper"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helper()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.helper_terms">
+<tt class="descname">helper_terms</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.helper_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with all the helper results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.helper" title="tamkin.partf.StatFys.helper"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helper()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.helpern">
+<tt class="descname">helpern</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.helpern" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpern" title="tamkin.partf.StatFys.helpern"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpern()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.helpern_terms">
+<tt class="descname">helpern_terms</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.helpern_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with all the helpern results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.helpern" title="tamkin.partf.StatFys.helpern"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpern()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.helpert">
+<tt class="descname">helpert</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.helpert" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpert" title="tamkin.partf.StatFys.helpert"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpert()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.helpert_terms">
+<tt class="descname">helpert_terms</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.helpert_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with all the helpert results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.helpert" title="tamkin.partf.StatFys.helpert"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpert()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.helpertt">
+<tt class="descname">helpertt</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.helpertt" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpertt" title="tamkin.partf.StatFys.helpertt"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpertt()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.helpertt_terms">
+<tt class="descname">helpertt_terms</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.helpertt_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with all the helpertt results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.helpertt" title="tamkin.partf.StatFys.helpertt"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpertt()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.helperv">
+<tt class="descname">helperv</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.helperv" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helperv" title="tamkin.partf.StatFys.helperv"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helperv()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.helperv_terms">
+<tt class="descname">helperv_terms</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.helperv_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with all the helperv results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.helperv" title="tamkin.partf.StatFys.helperv"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helperv()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.internal_heat_terms">
+<tt class="descname">internal_heat_terms</tt><big>(</big><em>temp</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.internal_heat_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with internal_heat results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.internal_heat" title="tamkin.partf.StatFys.internal_heat"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.internal_heat()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.log_terms">
+<tt class="descname">log_terms</tt><big>(</big><em>temp</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.log_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with log results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.log" title="tamkin.partf.StatFys.log"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.log()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.logn_terms">
+<tt class="descname">logn_terms</tt><big>(</big><em>temp</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.logn_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with logn results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.logn" title="tamkin.partf.StatFys.logn"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.logn()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.logt_terms">
+<tt class="descname">logt_terms</tt><big>(</big><em>temp</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.logt_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with logt results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.logt" title="tamkin.partf.StatFys.logt"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.logt()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.logtt_terms">
+<tt class="descname">logtt_terms</tt><big>(</big><em>temp</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.logtt_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with logtt results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.logtt" title="tamkin.partf.StatFys.logtt"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.logtt()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.logv_terms">
+<tt class="descname">logv_terms</tt><big>(</big><em>temp</em><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.logv_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with logv results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.logv" title="tamkin.partf.StatFys.logv"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.logv()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.StatFysTerms.zero_point_energy_terms">
+<tt class="descname">zero_point_energy_terms</tt><big>(</big><big>)</big><a class="headerlink" href="#tamkin.partf.StatFysTerms.zero_point_energy_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array with zero_point_energy results for the distinct terms.</p>
+<p>This is just an array version of <a class="reference internal" href="#tamkin.partf.StatFys.chemical_potential" title="tamkin.partf.StatFys.chemical_potential"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.chemical_potential()</span></tt></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tamkin.partf.helper_levels">
+<tt class="descclassname">tamkin.partf.</tt><tt class="descname">helper_levels</tt><big>(</big><em>temp</em>, <em>n</em>, <em>energy_levels</em>, <em>check=False</em><big>)</big><a class="headerlink" href="#tamkin.partf.helper_levels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper 0 function for a system with the given energy levels.</p>
+<p>Returns T^n ln(Z), where Z is the partition function</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+<div class="line"><tt class="docutils literal"><span class="pre">n</span></tt> &#8211; the power for the temperature factor</div>
+<div class="line"><tt class="docutils literal"><span class="pre">energy_levels</span></tt> &#8211; an array with energy levels</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">check</span></tt> &#8211; when set to True, an error is raise when the highest
+energy level is occupied by more than 1% the the current
+temperature.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="tamkin.partf.helpert_levels">
+<tt class="descclassname">tamkin.partf.</tt><tt class="descname">helpert_levels</tt><big>(</big><em>temp</em>, <em>n</em>, <em>energy_levels</em>, <em>check=False</em><big>)</big><a class="headerlink" href="#tamkin.partf.helpert_levels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper 1 function for a system with the given energy levels.</p>
+<p>Returns T^n (d ln(Z) / dT), where Z is the partition function</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+<div class="line"><tt class="docutils literal"><span class="pre">n</span></tt> &#8211; the power for the temperature factor</div>
+<div class="line"><tt class="docutils literal"><span class="pre">energy_levels</span></tt> &#8211; an array with energy levels</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">check</span></tt> &#8211; when set to True, an error is raise when the highest
+energy level is occupied by more than 1% the the current
+temperature.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="tamkin.partf.helpertt_levels">
+<tt class="descclassname">tamkin.partf.</tt><tt class="descname">helpertt_levels</tt><big>(</big><em>temp</em>, <em>n</em>, <em>energy_levels</em>, <em>check=False</em><big>)</big><a class="headerlink" href="#tamkin.partf.helpertt_levels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper 2 function for a system with the given energy levels.</p>
+<p>Returns T^n (d^2 ln(Z) / dT^2), where Z is the partition function</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+<div class="line"><tt class="docutils literal"><span class="pre">n</span></tt> &#8211; the power for the temperature factor</div>
+<div class="line"><tt class="docutils literal"><span class="pre">energy_levels</span></tt> &#8211; an array with energy levels</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">check</span></tt> &#8211; when set to True, an error is raise when the highest
+energy level is occupied by more than 1% the the current
+temperature.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.partf.Electronic">
+<em class="property">class </em><tt class="descclassname">tamkin.partf.</tt><tt class="descname">Electronic</tt><big>(</big><em>multiplicity=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.Electronic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tamkin.partf.Info" title="tamkin.partf.Info"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.partf.Info</span></tt></a>, <a class="reference internal" href="#tamkin.partf.StatFys" title="tamkin.partf.StatFys"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.partf.StatFys</span></tt></a></p>
+<p>The electronic contribution to the partition function.</p>
+<dl class="docutils">
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">multiplicity</span></tt> &#8211; the spin multiplicity of the electronic system</div>
+</div>
+</dd>
+</dl>
+<p>When the optional argument is not given, it is determined when the
+PartFun object is constructed.</p>
+<dl class="method">
+<dt id="tamkin.partf.Electronic.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.partf.Electronic.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.Info.dump" title="tamkin.partf.Info.dump"><tt class="xref py py-meth docutils literal"><span class="pre">Info.dump()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.Electronic.helper">
+<tt class="descname">helper</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.Electronic.helper" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helper" title="tamkin.partf.StatFys.helper"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helper()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.Electronic.helpert">
+<tt class="descname">helpert</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.Electronic.helpert" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpert" title="tamkin.partf.StatFys.helpert"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpert()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.Electronic.helpertt">
+<tt class="descname">helpertt</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.Electronic.helpertt" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpertt" title="tamkin.partf.StatFys.helpertt"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpertt()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.Electronic.init_part_fun">
+<tt class="descname">init_part_fun</tt><big>(</big><em>nma</em>, <em>partf</em><big>)</big><a class="headerlink" href="#tamkin.partf.Electronic.init_part_fun" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.init_part_fun" title="tamkin.partf.StatFys.init_part_fun"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.init_part_fun()</span></tt></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.partf.ExtTrans">
+<em class="property">class </em><tt class="descclassname">tamkin.partf.</tt><tt class="descname">ExtTrans</tt><big>(</big><em>cp=True</em>, <em>pressure=None</em>, <em>density=None</em>, <em>dim=3</em>, <em>mobile=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtTrans" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tamkin.partf.Info" title="tamkin.partf.Info"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.partf.Info</span></tt></a>, <a class="reference internal" href="#tamkin.partf.StatFys" title="tamkin.partf.StatFys"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.partf.StatFys</span></tt></a></p>
+<p>The contribution from the external translation.</p>
+<p>This contribution includes many body terms and optional constant pressure
+corrections. It is based on the classical ideal gas approximation.</p>
+<dl class="docutils">
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">cp</span></tt> &#8211; When True, an additional factor is included in the
+partition function to model a constant pressure (or
+constant surface tension) ensemble instead of a constant
+volume (or constant surface) ensemble.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">pressure</span></tt> &#8211; (only allowed when cp==True)
+The external pressure exerted on the system in
+case of the NpT ensemble. The default is 1 atm
+for 3D gases. The default for 2D systems is 75.64
+miliNewton per meter, i.e. the surface tension of
+water. For other dimensions, the default is 1.0.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">density</span></tt> &#8211; (only allowed when cp==False)
+The density of the system in case of the NVT
+ensemble. The default is 1.0 mol/meter**dim.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">dim</span></tt> &#8211; The dimension of the ideal gas.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">mobile</span></tt> &#8211; A list of atom indexes that are free to translate. In
+case of a mobile molecule adsorbed on a surface, only
+include atom indexes of the adsorbate. The default is
+that all atoms are mobile.</div>
+</div>
+</dd>
+</dl>
+<dl class="attribute">
+<dt id="tamkin.partf.ExtTrans.cp">
+<tt class="descname">cp</tt><a class="headerlink" href="#tamkin.partf.ExtTrans.cp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tamkin.partf.ExtTrans.density">
+<tt class="descname">density</tt><a class="headerlink" href="#tamkin.partf.ExtTrans.density" title="Permalink to this definition">¶</a></dt>
+<dd><p>The density in case of an NVT ensemble.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.ExtTrans.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtTrans.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.Info.dump" title="tamkin.partf.Info.dump"><tt class="xref py py-meth docutils literal"><span class="pre">Info.dump()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.ExtTrans.helper">
+<tt class="descname">helper</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtTrans.helper" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helper" title="tamkin.partf.StatFys.helper"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helper()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.ExtTrans.helpern">
+<tt class="descname">helpern</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtTrans.helpern" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpern" title="tamkin.partf.StatFys.helpern"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpern()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.ExtTrans.helpert">
+<tt class="descname">helpert</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtTrans.helpert" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpert" title="tamkin.partf.StatFys.helpert"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpert()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.ExtTrans.helpertt">
+<tt class="descname">helpertt</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtTrans.helpertt" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpertt" title="tamkin.partf.StatFys.helpertt"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpertt()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.ExtTrans.helperv">
+<tt class="descname">helperv</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtTrans.helperv" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helperv" title="tamkin.partf.StatFys.helperv"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helperv()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.ExtTrans.init_part_fun">
+<tt class="descname">init_part_fun</tt><big>(</big><em>nma</em>, <em>partf</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtTrans.init_part_fun" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.init_part_fun" title="tamkin.partf.StatFys.init_part_fun"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.init_part_fun()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tamkin.partf.ExtTrans.mobile">
+<tt class="descname">mobile</tt><a class="headerlink" href="#tamkin.partf.ExtTrans.mobile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tamkin.partf.ExtTrans.pressure">
+<tt class="descname">pressure</tt><a class="headerlink" href="#tamkin.partf.ExtTrans.pressure" title="Permalink to this definition">¶</a></dt>
+<dd><p>The pressure in case of an NpT ensemble.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.partf.ExtRot">
+<em class="property">class </em><tt class="descclassname">tamkin.partf.</tt><tt class="descname">ExtRot</tt><big>(</big><em>symmetry_number=None</em>, <em>im_threshold=1.0</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtRot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tamkin.partf.Info" title="tamkin.partf.Info"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.partf.Info</span></tt></a>, <a class="reference internal" href="#tamkin.partf.StatFys" title="tamkin.partf.StatFys"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.partf.StatFys</span></tt></a></p>
+<p>The contribution from the external rotation.</p>
+<p>This class is based on the integral approximation of the partition
+function.</p>
+<dl class="docutils">
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">symmetry_number</span></tt> &#8211; The rotational symmetry number of the
+molecule.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">im_threshold</span></tt>  &#8211;  When a moment of inertia drops below this
+threshold, it is discarded, which matters
+for linear molecules.</div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="tamkin.partf.ExtRot.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtRot.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.Info.dump" title="tamkin.partf.Info.dump"><tt class="xref py py-meth docutils literal"><span class="pre">Info.dump()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.ExtRot.helper">
+<tt class="descname">helper</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtRot.helper" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helper" title="tamkin.partf.StatFys.helper"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helper()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.ExtRot.helpert">
+<tt class="descname">helpert</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtRot.helpert" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpert" title="tamkin.partf.StatFys.helpert"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpert()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.ExtRot.helpertt">
+<tt class="descname">helpertt</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtRot.helpertt" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpertt" title="tamkin.partf.StatFys.helpertt"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpertt()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.ExtRot.init_part_fun">
+<tt class="descname">init_part_fun</tt><big>(</big><em>nma</em>, <em>partf</em><big>)</big><a class="headerlink" href="#tamkin.partf.ExtRot.init_part_fun" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.init_part_fun" title="tamkin.partf.StatFys.init_part_fun"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.init_part_fun()</span></tt></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.partf.PCMCorrection">
+<em class="property">class </em><tt class="descclassname">tamkin.partf.</tt><tt class="descname">PCMCorrection</tt><big>(</big><em>point1</em>, <em>point2=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.PCMCorrection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tamkin.partf.Info" title="tamkin.partf.Info"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.partf.Info</span></tt></a>, <a class="reference internal" href="#tamkin.partf.StatFys" title="tamkin.partf.StatFys"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.partf.StatFys</span></tt></a></p>
+<p>A correction to the free energy as function of the temperature.</p>
+<p>The correction can be a constant shift of the free energy or a linear
+shift of the free energy as function of the temperature.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">point1</span></tt> &#8211; A 2-tuple with free energy and a temperature. A
+correction for the free energy at the given
+temperature. (If no second point is given, the same
+correction is applied to all temperatures.)</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">point2</span></tt> &#8211; A 2-tuple with free energy and a temperature. In
+combination with point1, a linear free energy
+correction as function of the temperature is added.</div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="tamkin.partf.PCMCorrection.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.partf.PCMCorrection.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.Info.dump" title="tamkin.partf.Info.dump"><tt class="xref py py-meth docutils literal"><span class="pre">Info.dump()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.PCMCorrection.helper">
+<tt class="descname">helper</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.PCMCorrection.helper" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helper" title="tamkin.partf.StatFys.helper"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helper()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.PCMCorrection.helpert">
+<tt class="descname">helpert</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.PCMCorrection.helpert" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpert" title="tamkin.partf.StatFys.helpert"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpert()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.PCMCorrection.helpertt">
+<tt class="descname">helpertt</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.PCMCorrection.helpertt" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpertt" title="tamkin.partf.StatFys.helpertt"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpertt()</span></tt></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.partf.Vibrations">
+<em class="property">class </em><tt class="descclassname">tamkin.partf.</tt><tt class="descname">Vibrations</tt><big>(</big><em>classical=False</em>, <em>freq_scaling=1</em>, <em>zp_scaling=1</em>, <em>freq_threshold=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.Vibrations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tamkin.partf.Info" title="tamkin.partf.Info"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.partf.Info</span></tt></a>, <a class="reference internal" href="#tamkin.partf.StatFysTerms" title="tamkin.partf.StatFysTerms"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.partf.StatFysTerms</span></tt></a></p>
+<p>The vibrational contribution to the partition function.</p>
+<dl class="docutils">
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">classical</span></tt> &#8211; When True, the vibrations are treated classically
+[default=False]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">freq_scaling</span></tt> &#8211; Scale factor for the frequencies [default=1]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">zp_scaling</span></tt> &#8211; Scale factor for the zero-point energy
+correction [default=1]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">freq_threshold</span></tt> &#8211; Frequencies whose absolute value is below
+this threshold will be left out of the
+partition function, in addition to those
+already indicated as &#8216;almost&#8217; zero by the
+NMA. This option is only needed to fix some
+pathological cases.</div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="tamkin.partf.Vibrations.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.partf.Vibrations.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.Info.dump" title="tamkin.partf.Info.dump"><tt class="xref py py-meth docutils literal"><span class="pre">Info.dump()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.Vibrations.helper_terms">
+<tt class="descname">helper_terms</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.Vibrations.helper_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFysTerms.helper_terms" title="tamkin.partf.StatFysTerms.helper_terms"><tt class="xref py py-meth docutils literal"><span class="pre">StatFysTerms.helper_terms()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.Vibrations.helpert_terms">
+<tt class="descname">helpert_terms</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.Vibrations.helpert_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFysTerms.helpert_terms" title="tamkin.partf.StatFysTerms.helpert_terms"><tt class="xref py py-meth docutils literal"><span class="pre">StatFysTerms.helpert_terms()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.Vibrations.helpertt_terms">
+<tt class="descname">helpertt_terms</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.Vibrations.helpertt_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFysTerms.helpertt_terms" title="tamkin.partf.StatFysTerms.helpertt_terms"><tt class="xref py py-meth docutils literal"><span class="pre">StatFysTerms.helpertt_terms()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.Vibrations.init_part_fun">
+<tt class="descname">init_part_fun</tt><big>(</big><em>nma</em>, <em>partf</em><big>)</big><a class="headerlink" href="#tamkin.partf.Vibrations.init_part_fun" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.init_part_fun" title="tamkin.partf.StatFys.init_part_fun"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.init_part_fun()</span></tt></a>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tamkin.partf.helper_vibrations">
+<tt class="descclassname">tamkin.partf.</tt><tt class="descname">helper_vibrations</tt><big>(</big><em>temp</em>, <em>n</em>, <em>freqs</em>, <em>classical=False</em>, <em>freq_scaling=1</em>, <em>zp_scaling=1</em><big>)</big><a class="headerlink" href="#tamkin.partf.helper_vibrations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper 0 function for a set of harmonic oscillators.</p>
+<p>Returns T^n ln(Z), where Z is the partition function.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+<div class="line"><tt class="docutils literal"><span class="pre">n</span></tt> &#8211; the power for the temperature factor</div>
+<div class="line"><tt class="docutils literal"><span class="pre">freqs</span></tt> &#8211; an array with frequencies</div>
+</div>
+</dd>
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">classical</span></tt> &#8211; When True, the classical partition function is used.
+[default=False]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">freq_scaling</span></tt> &#8211; Scale the frequencies with the given factor.
+[default=1]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">freq_zp</span></tt> &#8211; Scale the zero-point energy correction with the given.
+factor [default=1]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="tamkin.partf.helpert_vibrations">
+<tt class="descclassname">tamkin.partf.</tt><tt class="descname">helpert_vibrations</tt><big>(</big><em>temp</em>, <em>n</em>, <em>freqs</em>, <em>classical=False</em>, <em>freq_scaling=1</em>, <em>zp_scaling=1</em><big>)</big><a class="headerlink" href="#tamkin.partf.helpert_vibrations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper 1 function for a set of harmonic oscillators.</p>
+<p>Returns T^n (d ln(Z) / dT), where Z is the partition function.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+<div class="line"><tt class="docutils literal"><span class="pre">n</span></tt> &#8211; the power for the temperature factor</div>
+<div class="line"><tt class="docutils literal"><span class="pre">energy_levels</span></tt> &#8211; an array with energy levels</div>
+</div>
+</dd>
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">classical</span></tt> &#8211; When True, the classical partition function is used
+[default=False]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">freq_scaling</span></tt> &#8211; Scale the frequencies with the given factor
+[default=1]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">freq_zp</span></tt> &#8211; Scale the zero-point energy correction with the given
+factor [default=1]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="tamkin.partf.helpertt_vibrations">
+<tt class="descclassname">tamkin.partf.</tt><tt class="descname">helpertt_vibrations</tt><big>(</big><em>temp</em>, <em>n</em>, <em>freqs</em>, <em>classical=False</em>, <em>freq_scaling=1</em>, <em>zp_scaling=1</em><big>)</big><a class="headerlink" href="#tamkin.partf.helpertt_vibrations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper 2 function for a set of harmonic oscillators.</p>
+<p>Returns T^n (d^2 ln(Z) / dT^2), where Z is the partition function.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; the temperature</div>
+<div class="line"><tt class="docutils literal"><span class="pre">n</span></tt> &#8211; the power for the temperature factor</div>
+<div class="line"><tt class="docutils literal"><span class="pre">energy_levels</span></tt> &#8211; an array with energy levels</div>
+</div>
+</dd>
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">classical</span></tt> &#8211; When True, the classical partition function is used
+[default=False]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">freq_scaling</span></tt> &#8211; Scale the frequencies with the given factor
+[default=1]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">freq_zp</span></tt> &#8211; Scale the zero-point energy correction with the given
+factor [default=1]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.partf.PartFun">
+<em class="property">class </em><tt class="descclassname">tamkin.partf.</tt><tt class="descname">PartFun</tt><big>(</big><em>nma</em>, <em>terms=None</em><big>)</big><a class="headerlink" href="#tamkin.partf.PartFun" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tamkin.partf.Info" title="tamkin.partf.Info"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.partf.Info</span></tt></a>, <a class="reference internal" href="#tamkin.partf.StatFys" title="tamkin.partf.StatFys"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.partf.StatFys</span></tt></a></p>
+<p>The partition function.</p>
+<p>This object contains all contributions to the partition function in
+self.terms and makes sure they are properly initialized. It also
+implements all the methods defined in StatFys, e.g. it can compute
+the entropy, the free energy and so on.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">nma</span></tt> &#8211; NMA object</div>
+</div>
+</dd>
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">terms</span></tt> &#8211; list to select the contributions to the partition
+function e.g. [Vibrations(classical=True), ExtRot(1)]</div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="tamkin.partf.PartFun.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.partf.PartFun.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.Info.dump" title="tamkin.partf.Info.dump"><tt class="xref py py-meth docutils literal"><span class="pre">Info.dump()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.PartFun.helper">
+<tt class="descname">helper</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.PartFun.helper" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helper" title="tamkin.partf.StatFys.helper"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helper()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.PartFun.helpern">
+<tt class="descname">helpern</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.PartFun.helpern" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpern" title="tamkin.partf.StatFys.helpern"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpern()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.PartFun.helpert">
+<tt class="descname">helpert</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.PartFun.helpert" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpert" title="tamkin.partf.StatFys.helpert"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpert()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.PartFun.helpertt">
+<tt class="descname">helpertt</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.PartFun.helpertt" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helpertt" title="tamkin.partf.StatFys.helpertt"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helpertt()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.PartFun.helperv">
+<tt class="descname">helperv</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.partf.PartFun.helperv" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.helperv" title="tamkin.partf.StatFys.helperv"><tt class="xref py py-meth docutils literal"><span class="pre">StatFys.helperv()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.partf.PartFun.write_to_file">
+<tt class="descname">write_to_file</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#tamkin.partf.PartFun.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an extensive description of the parition function to a file.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">filename</span></tt> &#8211; The name of the file to write to.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="chemical-models-based-on-partition-functions">
+<h2>4.2. Chemical models based on partition functions<a class="headerlink" href="#chemical-models-based-on-partition-functions" title="Permalink to this headline">¶</a></h2>
+<p>The term <cite>chemical models</cite> is used as a group name for thermodynamic models of
+chemical equilibria and kinetic models of chemical reactions.</p>
+<p class="graphviz">
+<img src="../_images/inheritance-2b049bec38b3d0f6d2eebd5ac858a148dd3c9842.png" alt="Inheritance diagram of tamkin.chemmod" usemap="#inheritance0a8724f3ad" class="inheritance"/>
+<map id="inheritance0a8724f3ad" name="inheritance0a8724f3ad">
+<area shape="rect" id="node1" href="#tamkin.chemmod.BaseKineticModel" title="BaseKineticModel" alt="" coords="99,81,233,106"/>
+<area shape="rect" id="node4" href="#tamkin.chemmod.ActivationKineticModel" title="ActivationKineticModel" alt="" coords="5,155,171,181"/>
+<area shape="rect" id="node5" href="#tamkin.chemmod.KineticModel" title="KineticModel" alt="" coords="195,155,297,181"/>
+<area shape="rect" id="node2" href="#tamkin.chemmod.BaseModel" title="BaseModel" alt="" coords="207,6,299,31"/>
+<area shape="rect" id="node3" href="#tamkin.chemmod.ThermodynamicModel" title="ThermodynamicModel" alt="" coords="259,81,421,106"/>
+</map>
+</p>
+<span class="target" id="module-tamkin.chemmod"></span><dl class="class">
+<dt id="tamkin.chemmod.BaseModel">
+<em class="property">class </em><tt class="descclassname">tamkin.chemmod.</tt><tt class="descname">BaseModel</tt><a class="headerlink" href="#tamkin.chemmod.BaseModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for all physico-chemical models.</p>
+<dl class="docutils">
+<dt>Useful attribute:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">pfs_all</span></tt> &#8211; A dictionary with all partition functions involved
+in the model. The values are the partition function
+objects. The keys are the corresponding signed
+stoichiometries.</div>
+</div>
+</dd>
+</dl>
+<p>The methods in the base class are mainly used by the Monte Carlo
+routine in the ReactionAnalysis class.</p>
+<dl class="method">
+<dt id="tamkin.chemmod.BaseModel.alter_freqs">
+<tt class="descname">alter_freqs</tt><big>(</big><em>freq_error</em>, <em>scale_energy</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.BaseModel.alter_freqs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly distort the frequencies and energies.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">freq_error</span></tt> &#8211; The absolute error to be introduced in the
+frequencies.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">scale_energy</span></tt> &#8211; The relative error to be introduced in the
+(electronic) energies.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.BaseModel.backup_freqs">
+<tt class="descname">backup_freqs</tt><big>(</big><big>)</big><a class="headerlink" href="#tamkin.chemmod.BaseModel.backup_freqs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keep a backup copy of the frequencies and the energy of each partition function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.BaseModel.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.BaseModel.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write all info about the model to a file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.BaseModel.dump_table">
+<tt class="descname">dump_table</tt><big>(</big><em>temp</em>, <em>c</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.BaseModel.dump_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a CSV file with the principal energies to a stream .</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; The temperature to use for the temperature-dependent
+quantities.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">c</span></tt> &#8211; A csv.writer object from the built-in Python csv module.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.BaseModel.energy_difference">
+<tt class="descname">energy_difference</tt><big>(</big><big>)</big><a class="headerlink" href="#tamkin.chemmod.BaseModel.energy_difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the electronic energy difference between (+) products and (-) reactants.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.BaseModel.equilibrium_constant">
+<tt class="descname">equilibrium_constant</tt><big>(</big><em>temp</em>, <em>do_log=False</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.BaseModel.equilibrium_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the equilibrium constant at the given temperature.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; The temperature.</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">do_log</span></tt> &#8211; When True, the logarithm of the equilibrium constant
+is returned instead of just the equilibrium constant
+itself. [default=False]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.BaseModel.free_energy_change">
+<tt class="descname">free_energy_change</tt><big>(</big><em>temp</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.BaseModel.free_energy_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the change in free energy.</p>
+<p>The change in free energy depends on the the pressure in the
+<tt class="docutils literal"><span class="pre">ExtTrans</span></tt> contribution to the partition function, if such a
+contribution would be present.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt>  &#8211; the temperature</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.BaseModel.internal_heat_difference">
+<tt class="descname">internal_heat_difference</tt><big>(</big><em>temp</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.BaseModel.internal_heat_difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the internal_heat difference between (+) products and (-) reactants.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; The temperature.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.BaseModel.restore_freqs">
+<tt class="descname">restore_freqs</tt><big>(</big><big>)</big><a class="headerlink" href="#tamkin.chemmod.BaseModel.restore_freqs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restore the backup of the frequencies and the energy of each partition function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.BaseModel.write_table">
+<tt class="descname">write_table</tt><big>(</big><em>temp</em>, <em>filename</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.BaseModel.write_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a CSV file with the principal energies to a file.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; The temperature to use for the temperature-dependent
+quantities.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">filename</span></tt> &#8211; The name of the CSV file.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.BaseModel.write_to_file">
+<tt class="descname">write_to_file</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.BaseModel.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the model to a text file.</p>
+<dl class="docutils">
+<dt>One argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">filename</span></tt> &#8211; The file to write the output.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.BaseModel.zero_point_energy_difference">
+<tt class="descname">zero_point_energy_difference</tt><big>(</big><big>)</big><a class="headerlink" href="#tamkin.chemmod.BaseModel.zero_point_energy_difference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the zero-point energy difference between (+) products and (-) reactants.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.chemmod.ThermodynamicModel">
+<em class="property">class </em><tt class="descclassname">tamkin.chemmod.</tt><tt class="descname">ThermodynamicModel</tt><big>(</big><em>pfs_react</em>, <em>pfs_prod</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.ThermodynamicModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>A model for a thermodynamic equilibrium.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">pfs_react</span></tt> &#8211; A list with reactant partition functions.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">pfs_prod</span></tt> &#8211; A list with product partition functions.</div>
+</div>
+</dd>
+</dl>
+<p>Both arguments are lists whose items should be PartFun objects.
+One may also replace an item by a <tt class="docutils literal"><span class="pre">(pf,</span> <span class="pre">st)</span></tt> tuple, where <tt class="docutils literal"><span class="pre">pf</span></tt> is
+the partition function and <tt class="docutils literal"><span class="pre">st</span></tt> is the stoichiometry.</p>
+<dl class="docutils">
+<dt>Useful attributes:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">unit_name</span></tt> &#8211; A string with the SI unit of the equilibrium
+constant</div>
+<div class="line"><tt class="docutils literal"><span class="pre">unit</span></tt> &#8211; The conversion factor to transform the equilibrium
+constant into SI units
+(<tt class="docutils literal"><span class="pre">equilibrium_const/self.unit</span></tt>)</div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="tamkin.chemmod.ThermodynamicModel.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.ThermodynamicModel.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write all info about the thermodynamic model to a file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.ThermodynamicModel.dump_table">
+<tt class="descname">dump_table</tt><big>(</big><em>temp</em>, <em>c</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.ThermodynamicModel.dump_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a CSV file with the principal energies to a stream .</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; The temperature to use for the temperature-dependent
+quantities.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">c</span></tt> &#8211; A csv.writer object from the built-in Python csv module.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.chemmod.BaseKineticModel">
+<em class="property">class </em><tt class="descclassname">tamkin.chemmod.</tt><tt class="descname">BaseKineticModel</tt><a class="headerlink" href="#tamkin.chemmod.BaseKineticModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generic model for the rate constant of a chemical reaction.</p>
+<dl class="docutils">
+<dt>Useful attribute:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">pfs_all</span></tt> &#8211; A dictionary with all partition functions involved
+in the model. The values are the partition function
+objects. The keys are the corresponding signed
+stoichiometries.</div>
+</div>
+</dd>
+</dl>
+<p>The methods in the base class are mainly used by the Monte Carlo
+routine in the ReactionAnalysis class.</p>
+<dl class="method">
+<dt id="tamkin.chemmod.BaseKineticModel.rate_constant">
+<tt class="descname">rate_constant</tt><big>(</big><em>temp</em>, <em>do_log=False</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.BaseKineticModel.rate_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the rate constant of the reaction in this analysis</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; The temperature.</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">do_log</span></tt> &#8211; When True, the logarithm of the rate constant is
+returned instead of just the rate constant itself.
+[default=False]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.chemmod.KineticModel">
+<em class="property">class </em><tt class="descclassname">tamkin.chemmod.</tt><tt class="descname">KineticModel</tt><big>(</big><em>pfs_react</em>, <em>pf_trans</em>, <em>tunneling=None</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.KineticModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>A model for the rate constant of a single-step chemical reaction.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">pfs_react</span></tt> &#8211; A list of partition functions for the reactants.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">pf_trans</span></tt> &#8211; The partition function of the transition state.</div>
+</div>
+</dd>
+</dl>
+<p>The first argument is a list whose items should be PartFun objects.
+One may also replace an item by a <tt class="docutils literal"><span class="pre">(pf,</span> <span class="pre">st)</span></tt> tuple, where <tt class="docutils literal"><span class="pre">pf</span></tt> is
+the partition function and <tt class="docutils literal"><span class="pre">st</span></tt> is the stoichiometry.</p>
+<dl class="docutils">
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">tunneling</span></tt> &#8211; A tunneling correction object. If not given, no
+tunneling correction is applied.</div>
+</div>
+</dd>
+<dt>Useful attributes:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">unit_name</span></tt> &#8211; A string containing the SI unit of the rate
+constant.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">unit</span></tt> &#8211; The conversion factor to transform the rate constant
+to SI units (<tt class="docutils literal"><span class="pre">rate_const/self.unit</span></tt>)</div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="tamkin.chemmod.KineticModel.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.KineticModel.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write all info about the kinetic model to a file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.KineticModel.dump_table">
+<tt class="descname">dump_table</tt><big>(</big><em>temp</em>, <em>c</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.KineticModel.dump_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a CSV file with the principal energies to a stream .</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; The temperature to use for the temperature-dependent
+quantities.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">c</span></tt> &#8211; A csv.writer object from the built-in Python csv module.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.KineticModel.rate_constant">
+<tt class="descname">rate_constant</tt><big>(</big><em>temp</em>, <em>do_log=False</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.KineticModel.rate_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.chemmod.BaseKineticModel.rate_constant" title="tamkin.chemmod.BaseKineticModel.rate_constant"><tt class="xref py py-meth docutils literal"><span class="pre">BaseKineticModel.rate_constant()</span></tt></a></p>
+<p>The implementation is based on transition state theory.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.chemmod.ActivationKineticModel">
+<em class="property">class </em><tt class="descclassname">tamkin.chemmod.</tt><tt class="descname">ActivationKineticModel</tt><big>(</big><em>tm</em>, <em>km</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.ActivationKineticModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>A model for the rate constant of a single-step chemical reaction with a pre-reactive complex.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">tm</span></tt> &#8211; The thermodynamic model for the pre-reactive complex.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">km</span></tt> &#8211; The kinetic model for the single-step reaction.</div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="tamkin.chemmod.ActivationKineticModel.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.ActivationKineticModel.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write all info about the kinetic model to a file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.chemmod.ActivationKineticModel.rate_constant">
+<tt class="descname">rate_constant</tt><big>(</big><em>temp</em>, <em>do_log=False</em><big>)</big><a class="headerlink" href="#tamkin.chemmod.ActivationKineticModel.rate_constant" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.chemmod.BaseKineticModel.rate_constant" title="tamkin.chemmod.BaseKineticModel.rate_constant"><tt class="xref py py-meth docutils literal"><span class="pre">BaseKineticModel.rate_constant()</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tamkin.pftools">
+<span id="tools-to-analyze-partition-functions-and-kinetic-models"></span><h2>4.3. Tools to analyze partition functions and kinetic models<a class="headerlink" href="#module-tamkin.pftools" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tamkin.pftools.ThermoAnalysis">
+<em class="property">class </em><tt class="descclassname">tamkin.pftools.</tt><tt class="descname">ThermoAnalysis</tt><big>(</big><em>pf</em>, <em>temps</em><big>)</big><a class="headerlink" href="#tamkin.pftools.ThermoAnalysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform a regular thermochemistry analysis.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">pf</span></tt> &#8211; A partition function</div>
+<div class="line"><tt class="docutils literal"><span class="pre">temps</span></tt> &#8211; An array with temperatures to consider.</div>
+</div>
+</dd>
+</dl>
+<p>The tables with energy, free energy, heat capacity, entropy,
+logarithm of the partition function and the first and second order
+derivative of the logarithm of the partition functions are computed
+and stored in self.tables. The latter attribute is a list of
+ThermoTable objects.</p>
+<p>The results can be written to a csv file with the method
+write_to_file.</p>
+<dl class="method">
+<dt id="tamkin.pftools.ThermoAnalysis.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.pftools.ThermoAnalysis.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the entire thermochemistry analysis in csv format.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">f</span></tt> &#8211; the stream to write to.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.pftools.ThermoAnalysis.write_to_file">
+<tt class="descname">write_to_file</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#tamkin.pftools.ThermoAnalysis.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the entire thermochemistry analysis to a csv file.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">filename</span></tt> &#8211; the file to write the output.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.pftools.ThermoTable">
+<em class="property">class </em><tt class="descclassname">tamkin.pftools.</tt><tt class="descname">ThermoTable</tt><big>(</big><em>label</em>, <em>unit</em>, <em>unit_name</em>, <em>method_name</em>, <em>pf</em>, <em>temps</em>, <em>pf_method_name=None</em><big>)</big><a class="headerlink" href="#tamkin.pftools.ThermoTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>A thermo table, i.e. the thermochemistry analysis for one
+specific thermodynamic quantity.</p>
+<p>This object is used by the ThermoAnalysis class and should probably
+never be used directly.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">label</span></tt> &#8211; a string to identify the thermodynamic quantity.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">unit</span></tt> &#8211; the conversion factor from the conventional unit to
+atomic units</div>
+<div class="line"><tt class="docutils literal"><span class="pre">unit_name</span></tt> &#8211; a human readable string that describes the
+conventional unit</div>
+<div class="line"><tt class="docutils literal"><span class="pre">method_name</span></tt> &#8211; the method of the partition function that
+computes the quantity of interest</div>
+<div class="line"><tt class="docutils literal"><span class="pre">temps</span></tt> &#8211; the temperatures at which the quantity has to be
+computed.</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">pf_method_name</span></tt> &#8211; In case of the actual partition function
+object, this alternative method can be used
+compute to quantity of interest. This
+workaround is required due to poor naming
+conventions in statistical physics.</div>
+</div>
+</dd>
+</dl>
+<p>The results are stored in an array self.data of which the columns
+correspond to the given temperatures and the rows correspond to the
+different terms in the partition function.</p>
+<p>The attribute self.keys is a list describing the rows, i.e. the each
+contribution from the partition function.</p>
+<dl class="method">
+<dt id="tamkin.pftools.ThermoTable.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.pftools.ThermoTable.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dumps the table in csv format</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">f</span></tt> &#8211; the file object to write to</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.pftools.ReactionAnalysis">
+<em class="property">class </em><tt class="descclassname">tamkin.pftools.</tt><tt class="descname">ReactionAnalysis</tt><big>(</big><em>kinetic_model</em>, <em>temp_low</em>, <em>temp_high</em>, <em>temp_step=10.0</em><big>)</big><a class="headerlink" href="#tamkin.pftools.ReactionAnalysis" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Reaction analysis object.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">kinetic_model</span></tt> &#8211; A kinetic model object. See
+mod:<cite>tamkin.chemmod</cite>.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">temp_low</span></tt> &#8211; The lower bound of the temperature interval in
+Kelvin.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">temp_high</span></tt> &#8211; The upper bound of the temperature interval in
+Kelvin.</div>
+</div>
+</dd>
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temp_step</span></tt> &#8211; The resolution of the temperature grid.
+[default=10K]</div>
+</div>
+</dd>
+</dl>
+<p>The rate constants are computed on the specified temperature grid
+and afterwards the kinetic parameters are fitted to these data. All
+the results are stored as attributes of the reaction analysis object
+and can be written to text files (method write_to_file) or plotted
+(methods plot and plot_parameters). The results from multiple
+reactions can be gathered in a single plot when this is desirable.</p>
+<dl class="docutils">
+<dt>The following attributes may be useful:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">A</span></tt> and <tt class="docutils literal"><span class="pre">Ea</span></tt> &#8211; The kinetic parameters in atomic units.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">R2</span></tt> &#8211; The Pearson R^2 of the fit.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">temps</span></tt> &#8211; An array with the temperature grid in Kelvin</div>
+<div class="line"><tt class="docutils literal"><span class="pre">temps_inv</span></tt> &#8211; An array with the inverse temperatures</div>
+<div class="line"><tt class="docutils literal"><span class="pre">rate_consts</span></tt> &#8211; the rate constants at the grid points in atomic
+units</div>
+<div class="line"><tt class="docutils literal"><span class="pre">ln_rate_consts</span></tt> &#8211; the logarithm of <cite>the rate constants in
+atomic units</cite></div>
+</div>
+</dd>
+</dl>
+<dl class="method">
+<dt id="tamkin.pftools.ReactionAnalysis.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.pftools.ReactionAnalysis.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the results in text format on screen or to another stream.</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">f</span></tt> &#8211; the file object to write to.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.pftools.ReactionAnalysis.monte_carlo">
+<tt class="descname">monte_carlo</tt><big>(</big><em>freq_error=7.251632778591094e-07</em>, <em>energy_error=0.0</em>, <em>num_iter=100</em><big>)</big><a class="headerlink" href="#tamkin.pftools.ReactionAnalysis.monte_carlo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate the uncertainty on the parameters</p>
+<p>The uncertainties are modeled by stochastic errors in the frequencies
+and the barrier. These may be caused by limitiated in convergence of
+the wafunction, limited convergence of the geometry optimization,
+errors in the numerical integration in DFT methods, or numerical
+errors due to the computation of the Hessian with a finite difference
+method.</p>
+<dl class="docutils">
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">freq_error</span></tt> &#8211; The with of the absolute gaussian distortion on
+the frequencies [default=1*invcm]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">energy_error</span></tt> &#8211; The width of the relative gaussian error on
+the energy barrier [default=0.00]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">num_iter</span></tt> &#8211; The number of Monte Carlo iterations
+[default=1000]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.pftools.ReactionAnalysis.plot_arrhenius">
+<tt class="descname">plot_arrhenius</tt><big>(</big><em>filename=None</em>, <em>label=None</em>, <em>color='red'</em><big>)</big><a class="headerlink" href="#tamkin.pftools.ReactionAnalysis.plot_arrhenius" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the rate constant and the fitted line.</p>
+<dl class="docutils">
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">filename</span></tt> &#8211; When given, the plot is written to that file,
+otherwise this plot method can be called multiple
+times with different reaction analysis objects to
+put all the results in one plot.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">label</span></tt> &#8211; When multiple fits are put in one figure, this label
+is used distinguish between the various results with
+a legend.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">color</span></tt> &#8211; Determines the color of the plotted data points and
+line. [default=&#8221;red&#8221;]. Common color names, html codes
+and RGB tuples are accepted. (See matplotlib docs for
+more info.)</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.pftools.ReactionAnalysis.plot_parameters">
+<tt class="descname">plot_parameters</tt><big>(</big><em>filename=None</em>, <em>label=None</em>, <em>color='red'</em>, <em>marker='o'</em>, <em>error=True</em><big>)</big><a class="headerlink" href="#tamkin.pftools.ReactionAnalysis.plot_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the kinetic parameters.</p>
+<dl class="docutils">
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">filename</span></tt> &#8211; When given, the plot is written to that file,
+otherwise this plot method can be called multiple
+times with different reaction analysis objects to
+put all the results in one plot.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">label</span></tt> &#8211; When multiple fits are put in one figure, this label
+is used distinguish between the various results with
+a legend.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">color</span></tt> &#8211; Determines the color of the plotted data points and
+line. [default=&#8221;red&#8221;]. Common color names, html codes
+and RGB tuples are accepted. (See matplotlib docs for
+more info.)</div>
+<div class="line"><tt class="docutils literal"><span class="pre">marker</span></tt> &#8211; The marker used for the (original) fitted parameters
+[default=&#8221;o&#8221;] (See matplotlib docs for more info.)</div>
+<div class="line"><tt class="docutils literal"><span class="pre">error</span></tt> &#8211; A boolean that determines whether the monte carlo
+results are plotted when they are available.
+[default=True]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.pftools.ReactionAnalysis.write_to_file">
+<tt class="descname">write_to_file</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#tamkin.pftools.ReactionAnalysis.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the entire analysis to a text file.</p>
+<dl class="docutils">
+<dt>One argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">filename</span></tt> &#8211; the file to write the output.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="the-1-d-rotor">
+<h2>4.4. The 1-D rotor<a class="headerlink" href="#the-1-d-rotor" title="Permalink to this headline">¶</a></h2>
+<p>The description of one-dimensional hindered rotors is also implemented in
+TAMkin, in the module <tt class="docutils literal"><span class="pre">rotor.py</span></tt>. It calculates the partition function of
+a 1-D rotor.</p>
+<span class="target" id="module-tamkin.rotor"></span><p>The current implementation supports one-dimensional free and hindered rotors.
+For practical applications it is apparently not necessary to consider higher-
+dimensional hindered rotors. [1]</p>
+<p>[1] Chemical Physics, Vol. 328 (1-3) 251 - 258, 2006</p>
+<dl class="class">
+<dt id="tamkin.rotor.HarmonicBasis">
+<em class="property">class </em><tt class="descclassname">tamkin.rotor.</tt><tt class="descname">HarmonicBasis</tt><big>(</big><em>nmax</em>, <em>a</em><big>)</big><a class="headerlink" href="#tamkin.rotor.HarmonicBasis" title="Permalink to this definition">¶</a></dt>
+<dd><p>A harmonic basis set for periodic one-dimensional QM systems</p>
+<p>In addition to the definition of the basis set, this class also
+implements the kinetic and potential energy operators required for the
+solution of the schrodinger equation. The workflow is as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mf">10.0</span>                             <span class="c"># the size of the system</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hb</span> <span class="o">=</span> <span class="n">HarmonicBasis</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>            <span class="c"># create basis object</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.01</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>    <span class="c"># define a grid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="n">grid</span><span class="o">-</span><span class="mi">5</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>        <span class="c"># define a potential on the grid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">v_coeffs</span> <span class="o">=</span> <span class="n">hb</span><span class="o">.</span><span class="n">fit_fn</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>    <span class="c"># expand the potential in the basis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mass</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">energies</span><span class="p">,</span> <span class="n">wfns</span> <span class="o">=</span> <span class="n">hb</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span> <span class="n">v_coeffs</span><span class="p">,</span> <span class="n">evecs</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c"># solve problem</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">nmax</span></tt> &#8211; The maximum index used for the gaussian basis. Hence
+the the number of basis functions is 2*nmax+1</div>
+<div class="line"><tt class="docutils literal"><span class="pre">a</span></tt> &#8211; The length of the periodic system</div>
+</div>
+</dd>
+<dt>The basis functions are:</dt>
+<dd><div class="first last line-block">
+<div class="line">1/sqrt(a/2)</div>
+<div class="line">cos(2*pi*x/a)/sqrt(a/2)</div>
+<div class="line">sin(2*pi*x/a)/sqrt(a/2)</div>
+<div class="line">...</div>
+<div class="line">cos(nmax*2*pi*x/a)/sqrt(a/2)</div>
+<div class="line">sin(nmax*2*pi*x/a)/sqrt(a/2)</div>
+</div>
+</dd>
+</dl>
+<p>This is an orthonormal basis. This object has methods to construct a
+Hamiltonian operator in this basis and to transform a function on a
+grid into an expansion in this basis (and back).</p>
+<dl class="method">
+<dt id="tamkin.rotor.HarmonicBasis.eval_deriv">
+<tt class="descname">eval_deriv</tt><big>(</big><em>grid</em>, <em>coeffs</em><big>)</big><a class="headerlink" href="#tamkin.rotor.HarmonicBasis.eval_deriv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the derivative of function represented by coeffs</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">grid</span></tt> &#8211; the values at which the derivative must ben evaluated</div>
+<div class="line"><tt class="docutils literal"><span class="pre">coeffs</span></tt> &#8211; the expansion coefficients</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.rotor.HarmonicBasis.eval_deriv2">
+<tt class="descname">eval_deriv2</tt><big>(</big><em>grid</em>, <em>coeffs</em><big>)</big><a class="headerlink" href="#tamkin.rotor.HarmonicBasis.eval_deriv2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the second derivative of function represented by coeffs</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">grid</span></tt> &#8211; the values at which the second derivative must be
+evaluated</div>
+<div class="line"><tt class="docutils literal"><span class="pre">coeffs</span></tt> &#8211; the expansion coefficients</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.rotor.HarmonicBasis.eval_fn">
+<tt class="descname">eval_fn</tt><big>(</big><em>grid</em>, <em>coeffs</em><big>)</big><a class="headerlink" href="#tamkin.rotor.HarmonicBasis.eval_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the function represented by coeffs</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">grid</span></tt> &#8211; the values at which the function must be evaluated</div>
+<div class="line"><tt class="docutils literal"><span class="pre">coeffs</span></tt> &#8211; the expansion coefficients</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.rotor.HarmonicBasis.fit_fn">
+<tt class="descname">fit_fn</tt><big>(</big><em>grid</em>, <em>v</em>, <em>dofmax</em>, <em>rotsym=1</em>, <em>even=False</em>, <em>rcond=0.0</em>, <em>v_threshold=0.01</em><big>)</big><a class="headerlink" href="#tamkin.rotor.HarmonicBasis.fit_fn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the expansion coefficients that represent function f</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">grid</span></tt> &#8211; The x values on which the function f is known.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">v</span></tt> &#8211; The function to be represented by expansion coefficients.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">dofmax</span></tt> &#8211; The maximum number of cosines in the fit. When
+even==False, the same number of sines is also
+included.</div>
+</div>
+</dd>
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">rotsym</span></tt> &#8211; Impose this rotational symmetry [default=1]. Must be
+an integer and is least 1..</div>
+<div class="line"><tt class="docutils literal"><span class="pre">even</span></tt> &#8211; Only fit even functions, i.e. cosines. [default=False]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">rcond</span></tt> &#8211; The cutoff for the singular values in the least
+squares fit. [default=1e-10]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">v_threshold</span></tt> &#8211; Tolerance on the relative error between the
+Fourier expansion and the data points of the
+scan. [default=0.01]. Absolute errors smaller
+than 1 kJ/mol are always ignored.</div>
+</div>
+</dd>
+</dl>
+<p>In case the Fourier expansion represents a poor fit (determined by
+v_threshold), a ValueError is raised. It means that you have to
+check your torsional scan datapoints for errors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.rotor.HarmonicBasis.get_empty_op">
+<tt class="descname">get_empty_op</tt><big>(</big><big>)</big><a class="headerlink" href="#tamkin.rotor.HarmonicBasis.get_empty_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an empty operator (zero)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.rotor.HarmonicBasis.get_hamiltonian_op">
+<tt class="descname">get_hamiltonian_op</tt><big>(</big><em>mass</em>, <em>potential</em><big>)</big><a class="headerlink" href="#tamkin.rotor.HarmonicBasis.get_hamiltonian_op" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Hamiltonian operator for the given mass and potential</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">mass</span></tt> &#8211; the mass of the particle</div>
+<div class="line"><tt class="docutils literal"><span class="pre">potential</span></tt> &#8211; the expansion coefficients of the potential energy</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tamkin.rotor.HarmonicBasis.size">
+<tt class="descname">size</tt><a class="headerlink" href="#tamkin.rotor.HarmonicBasis.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the basis set. (read-only attribute)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.rotor.HarmonicBasis.solve">
+<tt class="descname">solve</tt><big>(</big><em>mass</em>, <em>potential</em>, <em>evecs=False</em><big>)</big><a class="headerlink" href="#tamkin.rotor.HarmonicBasis.solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the energies and wavefunctions for the given mass and potential</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">mass</span></tt> &#8211; the mass of the particle</div>
+<div class="line"><tt class="docutils literal"><span class="pre">potential</span></tt> &#8211; the expansion coefficients of the potential energy</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">evecs</span></tt> &#8211; When True, also the eigenstates are returned.
+[default=False]</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tamkin.rotor.RotorError">
+<em class="property">exception </em><tt class="descclassname">tamkin.rotor.</tt><tt class="descname">RotorError</tt><a class="headerlink" href="#tamkin.rotor.RotorError" title="Permalink to this definition">¶</a></dt>
+<dd><p>This exception is raised when <a class="reference internal" href="#tamkin.rotor.Rotor" title="tamkin.rotor.Rotor"><tt class="xref py py-class docutils literal"><span class="pre">Rotor</span></tt></a> specific errors are
+encountered.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tamkin.rotor.compute_cancel_frequency_mbh">
+<tt class="descclassname">tamkin.rotor.</tt><tt class="descname">compute_cancel_frequency_mbh</tt><big>(</big><em>molecule</em>, <em>dihedral</em>, <em>top_indexes</em><big>)</big><a class="headerlink" href="#tamkin.rotor.compute_cancel_frequency_mbh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the frequency of the rotor in the HO approximation</p>
+<p>This function is based on the MBH method and returns the frequency that
+has to be canceled when this mode is replaced by a free or hindered
+rotor.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">molecule</span></tt> &#8211; A Molecule object. (see <a class="reference internal" href="aux.html#module-tamkin.data" title="tamkin.data"><tt class="xref py py-mod docutils literal"><span class="pre">tamkin.data</span></tt></a>)</div>
+<div class="line"><tt class="docutils literal"><span class="pre">top_indexes</span></tt> &#8211; The indexes of the rotor atoms.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="tamkin.rotor.compute_moments">
+<tt class="descclassname">tamkin.rotor.</tt><tt class="descname">compute_moments</tt><big>(</big><em>coordinates</em>, <em>masses3</em>, <em>center</em>, <em>axis</em>, <em>indexes</em><big>)</big><a class="headerlink" href="#tamkin.rotor.compute_moments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the absolute and the relative moment of an internal rotor</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">coordinates</span></tt> &#8211; The coordinates of all atoms, float numpy array
+with shape (N,3).</div>
+<div class="line"><tt class="docutils literal"><span class="pre">masses3</span></tt> &#8211; The diagonal of the mass matrix, each mass is repeated
+three tines, float numpy array with shape 3N.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">center</span></tt> &#8211; A point on the rotation axis. Float numpy array with
+shape 3.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">axis</span></tt> &#8211; A unit vector with the direction of the rotation axis.
+Float numpy array with shape 3.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">indexes</span></tt> &#8211; The indexes of the atoms that belong to the rotor.</div>
+</div>
+</dd>
+</dl>
+<p>The implementation is based on the transformation of the mass-matrix to
+the internal rotation coordinate. The derivative of the internal
+coordinate towards cartesian coordinates represents a small displacement
+of the atoms. This displacement is constrained to show no external
+linear or rotational moment.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.rotor.Rotor">
+<em class="property">class </em><tt class="descclassname">tamkin.rotor.</tt><tt class="descname">Rotor</tt><big>(</big><em>rot_scan</em>, <em>molecule=None</em>, <em>cancel_freq='mbh'</em>, <em>suffix=None</em>, <em>rotsym=1</em>, <em>even=False</em>, <em>num_levels=50</em>, <em>dofmax=5</em>, <em>v_threshold=0.01</em>, <em>large_fixed=False</em><big>)</big><a class="headerlink" href="#tamkin.rotor.Rotor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Partition function term for a one-dimensional rotor</p>
+<p>The contribution from the free or hindered rotor to the partition
+function is based on the quantum mechanical solution of the rotational
+motion. To avoid double counting problems, one must also provide the
+frequency of this motion as if it was treated as a harmonic oscillator.
+The corresponding contribution to the partition function is subtracted.
+(Use compute_cancel_frequency to obtain this frequency.)</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">rot_scan</span></tt> &#8211; A rotational scan object. (free or hindered rotor
+information)</div>
+</div>
+</dd>
+<dt>Optional arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">molecule</span></tt> &#8211; Molecule to which the rotor applies, is used to
+compute the cancelation frequency. Not required
+when the cancel_freq argument is present.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">cancel_freq</span></tt> &#8211; The frequency to cancel in the vibrational
+partition function. This can also be &#8216;mbh&#8217; or
+&#8216;scan&#8217; to indicate that the cancel frequency
+should be computed using the MBH method or
+based on the second order derivative of the
+rotational potential. Note that the latter
+option is only possible in the case of the
+hindered rotor formalism. [default=&#8217;mbh&#8217;]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">suffix</span></tt> &#8211; A name suffix used to distinguish between different
+rotors.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">rotsym</span></tt> &#8211; The rotational symmetry of the rotor. [default=1]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">even</span></tt> &#8211; True of the rotor is not chiral, i.e. when it has an
+even potential</div>
+<div class="line"><tt class="docutils literal"><span class="pre">num_levels</span></tt> &#8211; The number of energy levels considered in the
+QM treatment of the rotor [default=50]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">dofmax</span></tt> &#8211; The maximum number of cosines used to represent the
+torsional potential. if the potential is not even,
+the same number of sines is also used. [default=5]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">v_threshold</span></tt> &#8211; Tolerance on the relative error between the
+Fourier expansion and the data points of the
+scan. [default=0.01]. Absolute errors smaller
+than 1 kJ/mol are always ignored.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">large_fixed</span></tt> &#8211; When True, assume that the large part of the
+system is fixed in space while the small part
+rotates. (this means that the absolute moment
+of the rotor is used instead of the relative
+moment)</div>
+</div>
+</dd>
+</dl>
+<p>In case the Fourier expansion of the potential represents a poor fit
+(determined by v_threshold), a ValueError is raised. It means that
+you have to check your torsional scan datapoints for errors.</p>
+<dl class="method">
+<dt id="tamkin.rotor.Rotor.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.rotor.Rotor.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write all the information about the rotor to a file</p>
+<p>This method is part of the PartFun API and should never be called
+directly. It will only work properly once the init_part_fun method
+is called.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">f</span></tt> &#8211; A file-like object.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.rotor.Rotor.helper_terms">
+<tt class="descname">helper_terms</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.rotor.Rotor.helper_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFysTerms.helper_terms" title="tamkin.partf.StatFysTerms.helper_terms"><tt class="xref py py-meth docutils literal"><span class="pre">tamkin.partf.StatFysTerms.helper_terms()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.rotor.Rotor.helpert_terms">
+<tt class="descname">helpert_terms</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.rotor.Rotor.helpert_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFysTerms.helpert_terms" title="tamkin.partf.StatFysTerms.helpert_terms"><tt class="xref py py-meth docutils literal"><span class="pre">tamkin.partf.StatFysTerms.helpert_terms()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.rotor.Rotor.helpertt_terms">
+<tt class="descname">helpertt_terms</tt><big>(</big><em>temp</em>, <em>n</em><big>)</big><a class="headerlink" href="#tamkin.rotor.Rotor.helpertt_terms" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFysTerms.helpertt_terms" title="tamkin.partf.StatFysTerms.helpertt_terms"><tt class="xref py py-meth docutils literal"><span class="pre">tamkin.partf.StatFysTerms.helpertt_terms()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.rotor.Rotor.init_part_fun">
+<tt class="descname">init_part_fun</tt><big>(</big><em>nma</em>, <em>partf</em><big>)</big><a class="headerlink" href="#tamkin.rotor.Rotor.init_part_fun" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.partf.StatFys.init_part_fun" title="tamkin.partf.StatFys.init_part_fun"><tt class="xref py py-meth docutils literal"><span class="pre">tamkin.partf.StatFys.init_part_fun()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.rotor.Rotor.plot_levels">
+<tt class="descname">plot_levels</tt><big>(</big><em>prefix</em>, <em>temp</em>, <em>num=20</em>, <em>do_levels=True</em>, <em>do_data=True</em><big>)</big><a class="headerlink" href="#tamkin.rotor.Rotor.plot_levels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the potential with the energy levels</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">prefix</span></tt> &#8211; A filename prefix for the png files.</div>
+<div class="line"><tt class="docutils literal"><span class="pre">temp</span></tt> &#8211; A temperature that is used to indicate the statistical
+weight of each level in the plots</div>
+</div>
+</dd>
+<dt>Optional argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">num</span></tt> &#8211; The number of energy levels and wavefunctions to be
+plotted. [default=10]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">do_levels</span></tt> &#8211; When True, the energy levels are plotted.
+[default=True]</div>
+<div class="line"><tt class="docutils literal"><span class="pre">do_data</span></tt> &#8211; When True, the data points are plotted.
+[default=True]</div>
+</div>
+</dd>
+<dt>One image will be generated:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">${prefix}.png</span></tt> &#8211; The potential and the energy levels.</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tamkin.rotor.Rotor.potential">
+<tt class="descname">potential</tt><a class="headerlink" href="#tamkin.rotor.Rotor.potential" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Cached attribute:</em> A tuple with angles and potential energies (hindered only).</p>
+<p>If the rotor is free, the result is None. The reference for the
+potential energy is the energy of the reference geometry used in the
+partition function.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="tunneling-effects-in-chemical-reactions">
+<h2>4.5. Tunneling effects in chemical reactions<a class="headerlink" href="#tunneling-effects-in-chemical-reactions" title="Permalink to this headline">¶</a></h2>
+<p>This module calculates the correction to the partition function due
+to (quantum) tunneling through the reaction barrier.</p>
+<span class="target" id="module-tamkin.tunneling"></span><p>Instances of the classes <a class="reference internal" href="#tamkin.tunneling.Eckart" title="tamkin.tunneling.Eckart"><tt class="xref py py-class docutils literal"><span class="pre">Eckart</span></tt></a> or <a class="reference internal" href="#tamkin.tunneling.Wigner" title="tamkin.tunneling.Wigner"><tt class="xref py py-class docutils literal"><span class="pre">Wigner</span></tt></a> act as functions
+that take one argument, the temperature, and return a correction factor
+for the rate coefficient. Such an object can be given as an optional
+argument to the constructor of a <a class="reference internal" href="#tamkin.chemmod.KineticModel" title="tamkin.chemmod.KineticModel"><tt class="xref py py-class docutils literal"><span class="pre">tamkin.chemmod.KineticModel</span></tt></a>
+object to take tunneling corrections into account for the computation of
+rate constants.</p>
+<dl class="class">
+<dt id="tamkin.tunneling.TunnelingCorrection">
+<em class="property">class </em><tt class="descclassname">tamkin.tunneling.</tt><tt class="descname">TunnelingCorrection</tt><a class="headerlink" href="#tamkin.tunneling.TunnelingCorrection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract base class for the implementation of a Tunneling correction</p>
+<p>This class merely defines the interface and holds some docstrings.</p>
+<dl class="method">
+<dt id="tamkin.tunneling.TunnelingCorrection.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>temps</em><big>)</big><a class="headerlink" href="#tamkin.tunneling.TunnelingCorrection.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a the tunneling correction as function of the temperature</p>
+<dl class="docutils">
+<dt>Argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">temps</span></tt> &#8211; a numpy array of temperatures or a single temperature</div>
+</div>
+</dd>
+</dl>
+<p>Derived classes must override this method with a function that
+computes the correction factors for the rate constant at the given
+temperatures.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.tunneling.TunnelingCorrection.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.tunneling.TunnelingCorrection.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write descriptive info about the tunneling correction to a text file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.tunneling.Eckart">
+<em class="property">class </em><tt class="descclassname">tamkin.tunneling.</tt><tt class="descname">Eckart</tt><big>(</big><em>pfs_react</em>, <em>pf_trans</em>, <em>pfs_prod</em><big>)</big><a class="headerlink" href="#tamkin.tunneling.Eckart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the Eckart tunneling correction factor</p>
+<p>This correction is proposed in C. Eckart, Phys. Rev. 35, 1303 (1930),
+<a class="reference external" href="http://link.aps.org/doi/10.1103/PhysRev.35.1303">http://link.aps.org/doi/10.1103/PhysRev.35.1303</a>.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">pfs_react</span></tt> &#8211; a list with partition functions of the reactants</div>
+<div class="line"><tt class="docutils literal"><span class="pre">pf_trans</span></tt> &#8211; the partition function of the transition state</div>
+<div class="line"><tt class="docutils literal"><span class="pre">pfs_prod</span></tt> &#8211; a list with partition functions of the products</div>
+</div>
+</dd>
+<dt>Attributes derived from these arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">self.Ef</span></tt> &#8211; forward energy barrier</div>
+<div class="line"><tt class="docutils literal"><span class="pre">self.Er</span></tt> &#8211; reverse energy barrier</div>
+<div class="line"><tt class="docutils literal"><span class="pre">self.nu</span></tt> &#8211; the imaginary frequency (as a real number)</div>
+</div>
+</dd>
+</dl>
+<p>Note that this correction is only defined for transition states
+with only one imaginary frequency.</p>
+<dl class="method">
+<dt id="tamkin.tunneling.Eckart.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>temps</em><big>)</big><a class="headerlink" href="#tamkin.tunneling.Eckart.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.tunneling.TunnelingCorrection.__call__" title="tamkin.tunneling.TunnelingCorrection.__call__"><tt class="xref py py-meth docutils literal"><span class="pre">TunnelingCorrection.__call__()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.tunneling.Eckart.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.tunneling.Eckart.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write descriptive info about the tunneling correction to a text file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.tunneling.Wigner">
+<em class="property">class </em><tt class="descclassname">tamkin.tunneling.</tt><tt class="descname">Wigner</tt><big>(</big><em>pf_trans</em><big>)</big><a class="headerlink" href="#tamkin.tunneling.Wigner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the Wigner tunneling correction factor</p>
+<p>This correction is proposed in E. Wigner, Z. Physik. Chern. B 19, 203
+(1932).</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">pf_trans</span></tt> &#8211; the partition function of the transition state</div>
+</div>
+</dd>
+<dt>Attribute derived from these argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">self.nu</span></tt> &#8211; the imaginary frequency (as a real number)</div>
+</div>
+</dd>
+</dl>
+<p>Note that this correction is only defined for transition states
+with only one imaginary frequency.</p>
+<dl class="method">
+<dt id="tamkin.tunneling.Wigner.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>temps</em><big>)</big><a class="headerlink" href="#tamkin.tunneling.Wigner.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.tunneling.TunnelingCorrection.__call__" title="tamkin.tunneling.TunnelingCorrection.__call__"><tt class="xref py py-meth docutils literal"><span class="pre">TunnelingCorrection.__call__()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.tunneling.Wigner.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.tunneling.Wigner.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write descriptive info about the tunneling correction to a text file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tamkin.tunneling.Miller">
+<em class="property">class </em><tt class="descclassname">tamkin.tunneling.</tt><tt class="descname">Miller</tt><big>(</big><em>pf_trans</em><big>)</big><a class="headerlink" href="#tamkin.tunneling.Miller" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the Miller tunneling correction factor</p>
+<p>This correction is proposed in Miller, W. H. J. Chem. Phys. 1973, 61,
+1823, <a class="reference external" href="http://dx.doi.org/10.1063/1.1682181">http://dx.doi.org/10.1063/1.1682181</a>.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">pf_trans</span></tt> &#8211; the partition function of the transition state</div>
+</div>
+</dd>
+<dt>Attribute derived from these argument:</dt>
+<dd><div class="first last line-block">
+<div class="line"><tt class="docutils literal"><span class="pre">self.nu</span></tt> &#8211; the imaginary frequency (as a real number)</div>
+</div>
+</dd>
+</dl>
+<p>Note that this correction is only defined for transition states
+with only one imaginary frequency.</p>
+<dl class="method">
+<dt id="tamkin.tunneling.Miller.__call__">
+<tt class="descname">__call__</tt><big>(</big><em>temps</em><big>)</big><a class="headerlink" href="#tamkin.tunneling.Miller.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="#tamkin.tunneling.TunnelingCorrection.__call__" title="tamkin.tunneling.TunnelingCorrection.__call__"><tt class="xref py py-meth docutils literal"><span class="pre">TunnelingCorrection.__call__()</span></tt></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tamkin.tunneling.Miller.dump">
+<tt class="descname">dump</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#tamkin.tunneling.Miller.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write descriptive info about the tunneling correction to a text file</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">4. Partition functions</a><ul>
+<li><a class="reference internal" href="#the-molecular-partion-function">4.1. The molecular partion function</a></li>
+<li><a class="reference internal" href="#chemical-models-based-on-partition-functions">4.2. Chemical models based on partition functions</a></li>
+<li><a class="reference internal" href="#module-tamkin.pftools">4.3. Tools to analyze partition functions and kinetic models</a></li>
+<li><a class="reference internal" href="#the-1-d-rotor">4.4. The 1-D rotor</a></li>
+<li><a class="reference internal" href="#tunneling-effects-in-chemical-reactions">4.5. Tunneling effects in chemical reactions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="nma.html"
+                        title="previous chapter">3. Normal mode analysis</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="aux.html"
+                        title="next chapter">5. Auxiliary modules</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/reference/pf.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="aux.html" title="5. Auxiliary modules"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="nma.html" title="3. Normal mode analysis"
+             >previous</a> |</li>
+        <li><a href="../index.html">TAMkin 1.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2010, Toon Verstraelen, An Ghysels.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

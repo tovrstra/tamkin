@@ -1,0 +1,11 @@
+<map id="inheritance37628f8cbb" name="inheritance37628f8cbb">
+<area shape="rect" id="node1" href="#tamkin.partf.ExtTrans" title="ExtTrans" alt="" coords="481,81,556,106"/>
+<area shape="rect" id="node2" href="#tamkin.partf.Info" title="Info" alt="" coords="423,6,495,31"/>
+<area shape="rect" id="node4" href="#tamkin.partf.PartFun" title="PartFun" alt="" coords="580,81,652,106"/>
+<area shape="rect" id="node6" href="#tamkin.partf.ExtRot" title="ExtRot" alt="" coords="136,81,208,106"/>
+<area shape="rect" id="node7" href="#tamkin.partf.Electronic" title="Electronic" alt="" coords="233,81,316,106"/>
+<area shape="rect" id="node8" href="#tamkin.partf.Vibrations" title="Vibrations" alt="" coords="327,155,413,181"/>
+<area shape="rect" id="node9" href="#tamkin.partf.PCMCorrection" title="PCMCorrection" alt="" coords="341,81,456,106"/>
+<area shape="rect" id="node3" href="#tamkin.partf.StatFys" title="StatFys" alt="" coords="283,6,355,31"/>
+<area shape="rect" id="node5" href="#tamkin.partf.StatFysTerms" title="StatFysTerms" alt="" coords="5,81,112,106"/>
+</map>

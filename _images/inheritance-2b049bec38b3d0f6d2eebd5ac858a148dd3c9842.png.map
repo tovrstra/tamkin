@@ -1,0 +1,7 @@
+<map id="inheritance0a8724f3ad" name="inheritance0a8724f3ad">
+<area shape="rect" id="node1" href="#tamkin.chemmod.BaseKineticModel" title="BaseKineticModel" alt="" coords="99,81,233,106"/>
+<area shape="rect" id="node4" href="#tamkin.chemmod.ActivationKineticModel" title="ActivationKineticModel" alt="" coords="5,155,171,181"/>
+<area shape="rect" id="node5" href="#tamkin.chemmod.KineticModel" title="KineticModel" alt="" coords="195,155,297,181"/>
+<area shape="rect" id="node2" href="#tamkin.chemmod.BaseModel" title="BaseModel" alt="" coords="207,6,299,31"/>
+<area shape="rect" id="node3" href="#tamkin.chemmod.ThermodynamicModel" title="ThermodynamicModel" alt="" coords="259,81,421,106"/>
+</map>
